@@ -35,5 +35,7 @@ source .venv/bin/activate
 4. Install the dependencies
 
 ```bash
-pip install -r requirements.txt
+(.venv)$ pip install -r requirements.txt
 ```
+
+5. Run the notebook
