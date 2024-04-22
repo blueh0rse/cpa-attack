@@ -23,13 +23,13 @@ git clone https://github.com/blueh0rse/cpa-attack
 2. Create a virtual environment
 
 ```bash
-python3 -m venv .env
+python3 -m venv .venv
 ```
 
 3. Activate the virtual environment
 
 ```bash
-source .env/bin/activate
+source .venv/bin/activate
 ```
 
 4. Install the dependencies
