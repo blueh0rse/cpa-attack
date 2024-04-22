@@ -10,4 +10,30 @@ The students will be provided with a set of power consumption traces acquired wh
 
 ![Figure 1: Diagram of the experimental setup to acquire the power consumption traces](assets/image.png)
 
-*Figure 1: Diagram of the experimental setup to acquire the power consumption traces*
+_Figure 1: Diagram of the experimental setup to acquire the power consumption traces_
+
+## Instructions
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/blueh0rse/cpa-attack
+```
+
+2. Create a virtual environment
+
+```bash
+python3 -m venv .env
+```
+
+3. Activate the virtual environment
+
+```bash
+source .env/bin/activate
+```
+
+4. Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
