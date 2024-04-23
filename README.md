@@ -69,3 +69,21 @@ source .venv/bin/activate
 ```
 
 5. Run the notebook `attack1.ipynb`
+
+## Steps
+
+### 1. Process the traces
+
+- We first initialized a 3D NumPy array to hold all the traces from `data/dataset1`. Dimensions: 16 key bytes x 150 traces x 50000 samples
+- Then a second 2D NumPy array to hold the plaintexts of `data/dataset1/cleartext.txt`. Dimensions: 150 plaintexts x 16 bytes
+
+### 2. Generate hypotheses
+
+- For simplicity and transparency reasons we initialized a fixed array containing the AES substitution box values
+- Created an array of all possible byte values (0 to 255) for key guessing
+- Added an extra dimension to the plaintext array to prepare it for element-wise operations with the key guesses
+  - This was needed for performance reason as loops in python can be ver slow when dealing with very large amount of data
+- Adjusts the shape of the key guesses array to facilitate broadcasting with the expanded plaintext array.
+- Performs a bitwise XOR between every plaintext byte and each key guess, simulating the first step of the AES encryption (AddRoundKey).
+- Uses the XOR results as indices to retrieve values from the S-box, converting the output into 8-bit unsigned integers for bit manipulation.
+- Converts the S-box output to uint8, unpacks each byte to bits, and then reshapes and sums these bits to compute the Hamming weights for each byte.
