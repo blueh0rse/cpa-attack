@@ -12,6 +12,36 @@ The students will be provided with a set of power consumption traces acquired wh
 
 _Figure 1: Diagram of the experimental setup to acquire the power consumption traces_
 
+## Overview
+
+````
+├── LICENSE
+├── README.md
+├── assets
+│   └── image.png
+├── attack1.ipynb
+├── data
+│   └── dataset1
+│       ├── cleartext.txt
+│       ├── trace0.txt
+│       ├── trace1.txt
+│       ├── trace2.txt
+│       ├── trace3.txt
+│       ├── trace4.txt
+│       ├── trace5.txt
+│       ├── trace6.txt
+│       ├── trace7.txt
+│       ├── trace8.txt
+│       ├── trace9.txt
+│       ├── trace10.txt
+│       ├── trace11.txt
+│       ├── trace12.txt
+│       ├── trace13.txt
+│       ├── trace14.txt
+│       └── trace15.txt
+└── requirements.txt
+````
+
 ## Instructions
 
 1. Clone the repository
@@ -38,4 +68,4 @@ source .venv/bin/activate
 (.venv)$ pip install -r requirements.txt
 ```
 
-5. Run the notebook
+5. Run the notebook `attack1.ipynb`
