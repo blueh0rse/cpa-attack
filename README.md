@@ -14,7 +14,7 @@ _Figure 1: Diagram of the experimental setup to acquire the power consumption tr
 
 ## Overview
 
-````
+```
 ├── LICENSE
 ├── README.md
 ├── assets
@@ -40,7 +40,7 @@ _Figure 1: Diagram of the experimental setup to acquire the power consumption tr
 │       ├── trace14.txt
 │       └── trace15.txt
 └── requirements.txt
-````
+```
 
 ## Instructions
 
@@ -68,7 +68,11 @@ source .venv/bin/activate
 (.venv)$ pip install -r requirements.txt
 ```
 
-5. Run the notebook `attack1.ipynb`
+5. Select a python kernel for the notebook
+
+Example: `.venv (Python 3.10.12)`
+
+6. Run the notebook `attack1.ipynb`
 
 ## Steps
 
