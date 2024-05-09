@@ -97,20 +97,16 @@ if __name__ == "__main__":
         with open(f"{workdir}/trace{i}.txt") as f:
             for t, line in enumerate(f):
                 all_traces[i][t] = np.array(line.strip().split(), dtype=np.float64)
-    # for i in range(num_key_bytes):
-    #     filename = f'{workdir}/trace{i}.txt'
-    #     with open(filename, 'r') as file:
-    #         for j, line in enumerate(file):
-    #             # Convert line to float values and store in array
-    #             all_traces[j, 50000*i:50000*(i+1)] = np.array(line.strip().split(), dtype=np.float64)
+
+    all_clocks = np.zeros((16, 150, 50000), dtype=np.float64)
 
     # read the clocks if dataset = 2
     if arg == 2:
         print("Loading clocks...")
         for i in range(16):
-            with open(f"{workdir}/trace{i}.txt") as f:
+            with open(f"{workdir}/clock{i}.txt") as f:
                 for t, line in enumerate(f):
-                    all_traces[i][t] = np.array(line.strip().split(), dtype=np.float64)
+                    all_clocks[i][t] = np.array(line.strip().split(), dtype=np.float64)
 
     hamming_weights = np.array([hamming_weight(i) for i in range(256)])
 
@@ -133,6 +129,7 @@ if __name__ == "__main__":
         # print(np.argsort(coeff2[box, :])[-1])
         key_bytes.append(np.argsort(coeff2[box, :])[-1])
 
+    # result verification
     if arg == 1:
         if np.sum(key_bytes) == 1712:
             print("Attack was successful :)")
