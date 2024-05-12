@@ -141,4 +141,5 @@ if __name__ == "__main__":
         else:
             print("Attack failed :(")
 
+    print(f"Key bytes: {key_bytes}")
     print(f"Key checksum: {np.sum(key_bytes)}")
