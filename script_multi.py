@@ -25,27 +25,29 @@ def calc_weights():
             sub_out = sub_bytes(added_key, False).flatten()
 
             for byte_index in range(sub_out.shape[0]):
-                all_hamming_weights_per_box2[tnum][key_guess][byte_index] = (
-                    hamming_weights[sub_out[byte_index]]
-                )
+                all_hamming_weights_per_box[tnum][key_guess][byte_index] = hamming_weights[sub_out[byte_index]]
 
 
 def multi(box: int):
     print(f"Started working on box {box}", flush=True)
+    rise_threshold = 0.8 # 0.7 didn't work out for us, the "sweet spot" seems to be 0.8
 
     if arg == 2:
         traces_around_clock_flank = np.zeros((16, 150, 5010), dtype=np.float64)
         for input_index in range(150):
             counter = 0
             for sample_index in range(50000):
-                if (sample_index > 5 and sample_index < 49995 and all_clocks[box][input_index][sample_index - 1] < 0.8 and all_clocks[box][input_index][sample_index] >= 0.8):
+                if (sample_index > 5
+                    and sample_index < 49995
+                    and all_clocks[box][input_index][sample_index - 1] < rise_threshold
+                    and all_clocks[box][input_index][sample_index] >= rise_threshold):
                     for x in range(10):
                         traces_around_clock_flank[box][input_index][counter] = all_traces[box][input_index][sample_index - 5 + x]
                         counter = counter + 1
 
         maxes = np.zeros(256, dtype=np.float64)
         for guess in range(256):
-            guess_box_weights = all_hamming_weights_per_box2[:, guess, box]
+            guess_box_weights = all_hamming_weights_per_box[:, guess, box]
             WxH = (traces_around_clock_flank[box].T * guess_box_weights).T
             EWxH = np.sum(WxH, axis=0)
 
@@ -67,7 +69,7 @@ def multi(box: int):
     else:
         maxes = np.zeros(256, dtype=np.float64)
         for guess in range(256):
-            guess_box_weights = all_hamming_weights_per_box2[:, guess, box]
+            guess_box_weights = all_hamming_weights_per_box[:, guess, box]
             WxH = (all_traces[box].T * guess_box_weights).T
             EWxH = np.sum(WxH, axis=0)
 
@@ -143,7 +145,7 @@ if __name__ == "__main__":
 
     hamming_weights = np.array([hamming_weight(i) for i in range(256)])
 
-    all_hamming_weights_per_box2 = np.zeros((150, 256, 16), dtype=np.uint8)
+    all_hamming_weights_per_box = np.zeros((150, 256, 16), dtype=np.uint8)
     coeff2 = np.zeros((16, 256))
 
     print("Weights...")
@@ -157,7 +159,6 @@ if __name__ == "__main__":
     np.set_printoptions(formatter={"hex": int})
 
     for box in range(16):
-        # print(np.argsort(coeff2[box, :])[-1])
         key_bytes.append(np.argsort(coeff2[box, :])[-1])
 
     # result verification
