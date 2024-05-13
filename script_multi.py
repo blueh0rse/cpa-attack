@@ -32,26 +32,59 @@ def calc_weights():
 
 def multi(box: int):
     print(f"Started working on box {box}", flush=True)
-    maxes = np.zeros(256, dtype=np.float64)
-    for guess in range(256):
-        guess_box_weights = all_hamming_weights_per_box2[:, guess, box]
-        WxH = (all_traces[box].T * guess_box_weights).T
-        EWxH = np.sum(WxH, axis=0)
 
-        Ew = np.sum(all_traces[box], axis=0)  # constant
+    if arg == 2:
+        traces_around_clock_flank = np.zeros((16, 150, 5010), dtype=np.float64)
+        for input_index in range(150):
+            counter = 0
+            for sample_index in range(50000):
+                if (sample_index > 5 and sample_index < 49995 and all_clocks[box][input_index][sample_index - 1] < 0.8 and all_clocks[box][input_index][sample_index] >= 0.8):
+                    for x in range(10):
+                        traces_around_clock_flank[box][input_index][counter] = all_traces[box][input_index][sample_index - 5 + x]
+                        counter = counter + 1
 
-        Eh = np.sum(guess_box_weights)
+        maxes = np.zeros(256, dtype=np.float64)
+        for guess in range(256):
+            guess_box_weights = all_hamming_weights_per_box2[:, guess, box]
+            WxH = (traces_around_clock_flank[box].T * guess_box_weights).T
+            EWxH = np.sum(WxH, axis=0)
 
-        Ew2 = np.sum(np.square(all_traces[box]), axis=0)  # constant
-        Ew_squared = np.square(Ew)  # constant
+            Ew = np.sum(traces_around_clock_flank[box], axis=0)  # constant
 
-        Eh2 = np.sum(np.square(guess_box_weights), axis=0)
-        Eh_squared = np.square(Eh)
+            Eh = np.sum(guess_box_weights)
 
-        top = (150 * EWxH) - (Eh * Ew)
-        bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt((150 * Eh2) - Eh_squared)
-        maxes[guess] = np.max(top / bottom)
-    return box, maxes
+            Ew2 = np.sum(np.square(traces_around_clock_flank[box]), axis=0)  # constant
+            Ew_squared = np.square(Ew)  # constant
+
+            Eh2 = np.sum(np.square(guess_box_weights), axis=0)
+            Eh_squared = np.square(Eh)
+
+            top = (150 * EWxH) - (Eh * Ew)
+            bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt((150 * Eh2) - Eh_squared)
+            maxes[guess] = np.max(top / bottom)
+        return box, maxes
+
+    else:
+        maxes = np.zeros(256, dtype=np.float64)
+        for guess in range(256):
+            guess_box_weights = all_hamming_weights_per_box2[:, guess, box]
+            WxH = (all_traces[box].T * guess_box_weights).T
+            EWxH = np.sum(WxH, axis=0)
+
+            Ew = np.sum(all_traces[box], axis=0)  # constant
+
+            Eh = np.sum(guess_box_weights)
+
+            Ew2 = np.sum(np.square(all_traces[box]), axis=0)  # constant
+            Ew_squared = np.square(Ew)  # constant
+
+            Eh2 = np.sum(np.square(guess_box_weights), axis=0)
+            Eh_squared = np.square(Eh)
+
+            top = (150 * EWxH) - (Eh * Ew)
+            bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt((150 * Eh2) - Eh_squared)
+            maxes[guess] = np.max(top / bottom)
+        return box, maxes
 
 
 if __name__ == "__main__":
@@ -65,7 +98,7 @@ if __name__ == "__main__":
     # Try to convert the argument to an integer and check its value
     try:
         arg = int(sys.argv[1])
-        if arg in {1, 2}:
+        if arg in [1, 2]:
             print(f"Selected dataset: {arg}")
         else:
             print("Error: Argument must be either 1 or 2.")
@@ -115,8 +148,6 @@ if __name__ == "__main__":
 
     print("Weights...")
     calc_weights()
-
-    # coeff2[0] = multi(0)[1]
 
     with Pool() as pool:
         for box, coeffs in pool.imap_unordered(multi, range(16)):
