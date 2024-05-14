@@ -72,15 +72,59 @@ source .venv/bin/activate
 
 Example: `.venv (Python 3.10.12)`
 
-6. Run the notebook `attack1.ipynb`
+6. You can now run the following files:
+
+- `attack1.ipynb`: to see how we solved dataset1
+- `attack2.ipynb`: to see how we solved dataset2
+- `script_multi.py`: to run our fastest, most optimized code
+
+Output example for dataset 1:
+
+```bash
+(.venv)$ python3 script_multi.py 1
+Selected dataset: 1
+Loading cleartexts...
+Loading traces...
+Computing Weights...
+Started working on box 0
+Started working on box 1
+...
+finished box 4
+finished box 2
+Key bytes: [65, 117, 115, 116, 114, 97, 108, 111, 112, 105, 116, 104, 101, 99, 117, 115]
+Key checksum: 1712
+Attack was successful :)
+Attack performed in: 00:00:48
+```
+
+Output example for dataset 2:
+
+```bash
+(.venv)$ python3 script_multi.py 2
+Selected dataset: 2
+Loading cleartexts...
+Loading traces...
+Loading clocks...
+Computing Weights...
+Working on flanks...
+Started working on box 0
+Started working on box 1
+...
+finished box 7
+finished box 13
+Key bytes: [84, 104, 97, 116, 115, 32, 109, 121, 32, 75, 117, 110, 103, 32, 70, 117]
+Key checksum: 1434
+Attack was successful :)
+Attack performed in: 00:00:27
+```
 
 ## Steps
 
 ### 1. Process the traces
 
-- We first initialized a 3D NumPy array to hold all the traces from `data/dataset1`. 
+- We first initialized a 3D NumPy array to hold all the traces from `data/dataset1`.
   - Dimensions: 16 key bytes x 150 traces x 50000 samples
-- Then a second 2D NumPy array to hold the plaintexts of `data/dataset1/cleartext.txt`. 
+- Then a second 2D NumPy array to hold the plaintexts of `data/dataset1/cleartext.txt`.
   - Dimensions: 150 plaintexts x 16 bytes
 
 ### 2. Generate hypotheses
