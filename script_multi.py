@@ -1,10 +1,8 @@
 import sys
 import numpy as np
-import numpy.typing as npt
-import matplotlib.pyplot as plt
 from anthony.aes import sub_bytes, add_round_key
-from scipy.stats import pearsonr
 from multiprocessing import Pool
+import time
 
 
 def hamming_weight(n):
@@ -25,24 +23,30 @@ def calc_weights():
             sub_out = sub_bytes(added_key, False).flatten()
 
             for byte_index in range(sub_out.shape[0]):
-                all_hamming_weights_per_box[tnum][key_guess][byte_index] = hamming_weights[sub_out[byte_index]]
+                all_hamming_weights_per_box[tnum][key_guess][byte_index] = (
+                    hamming_weights[sub_out[byte_index]]
+                )
 
 
 def multi(box: int):
     print(f"Started working on box {box}", flush=True)
-    rise_threshold = 0.8 # 0.7 didn't work out for us, the "sweet spot" seems to be 0.8
+    rise_threshold = 0.8  # 0.7 didn't work out for us, the "sweet spot" seems to be 0.8
 
     if arg == 2:
         traces_around_clock_flank = np.zeros((16, 150, 5010), dtype=np.float64)
         for input_index in range(150):
             counter = 0
             for sample_index in range(50000):
-                if (sample_index > 5
+                if (
+                    sample_index > 5
                     and sample_index < 49995
                     and all_clocks[box][input_index][sample_index - 1] < rise_threshold
-                    and all_clocks[box][input_index][sample_index] >= rise_threshold):
+                    and all_clocks[box][input_index][sample_index] >= rise_threshold
+                ):
                     for x in range(10):
-                        traces_around_clock_flank[box][input_index][counter] = all_traces[box][input_index][sample_index - 5 + x]
+                        traces_around_clock_flank[box][input_index][counter] = (
+                            all_traces[box][input_index][sample_index - 5 + x]
+                        )
                         counter = counter + 1
 
         maxes = np.zeros(256, dtype=np.float64)
@@ -62,7 +66,9 @@ def multi(box: int):
             Eh_squared = np.square(Eh)
 
             top = (150 * EWxH) - (Eh * Ew)
-            bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt((150 * Eh2) - Eh_squared)
+            bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt(
+                (150 * Eh2) - Eh_squared
+            )
             maxes[guess] = np.max(top / bottom)
         return box, maxes
 
@@ -84,7 +90,9 @@ def multi(box: int):
             Eh_squared = np.square(Eh)
 
             top = (150 * EWxH) - (Eh * Ew)
-            bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt((150 * Eh2) - Eh_squared)
+            bottom = np.sqrt((150 * Ew2) - Ew_squared) * np.sqrt(
+                (150 * Eh2) - Eh_squared
+            )
             maxes[guess] = np.max(top / bottom)
         return box, maxes
 
@@ -108,6 +116,9 @@ if __name__ == "__main__":
     except ValueError:
         print("Error: Argument must be an integer.")
         sys.exit(1)
+
+    # start timer
+    start_time = time.time()
 
     workdir = f"data/dataset{arg}"
     num_traces = 150
@@ -148,9 +159,10 @@ if __name__ == "__main__":
     all_hamming_weights_per_box = np.zeros((150, 256, 16), dtype=np.uint8)
     coeff2 = np.zeros((16, 256))
 
-    print("Weights...")
+    print("Computing Weights...")
     calc_weights()
 
+    print("Working on flanks...")
     with Pool() as pool:
         for box, coeffs in pool.imap_unordered(multi, range(16)):
             print(f"finished box {box}", flush=True)
@@ -160,6 +172,12 @@ if __name__ == "__main__":
 
     for box in range(16):
         key_bytes.append(np.argsort(coeff2[box, :])[-1])
+
+    # stop timer
+    end_time = time.time() - start_time
+
+    print(f"Key bytes: {key_bytes}")
+    print(f"Key checksum: {np.sum(key_bytes)}")
 
     # result verification
     if arg == 1:
@@ -173,5 +191,4 @@ if __name__ == "__main__":
         else:
             print("Attack failed :(")
 
-    print(f"Key bytes: {key_bytes}")
-    print(f"Key checksum: {np.sum(key_bytes)}")
+    print("Attack performed in:", time.strftime("%H:%M:%S", time.gmtime(end_time)))
